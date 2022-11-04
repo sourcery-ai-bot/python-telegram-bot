@@ -83,9 +83,9 @@ class Audio(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
-        self.duration = int(duration)
+        self.file_id = file_id
+        self.file_unique_id = file_unique_id
+        self.duration = duration
         # Optionals
         self.performer = performer
         self.title = title

@@ -49,27 +49,18 @@ class TelegramObject:
 
     @staticmethod
     def parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
-        if not data:
-            return None
-        return data.copy()
+        return data.copy() if data else None
 
     @classmethod
     def de_json(cls: Type[TO], data: Optional[JSONDict], bot: 'Bot') -> Optional[TO]:
-        data = cls.parse_data(data)
-
-        if not data:
+        if data := cls.parse_data(data):
+            return cls() if cls == TelegramObject else cls(bot=bot, **data)
+        else:
             return None
-
-        if cls == TelegramObject:
-            return cls()
-        return cls(bot=bot, **data)  # type: ignore[call-arg]
 
     @classmethod
     def de_list(cls: Type[TO], data: Optional[List[JSONDict]], bot: 'Bot') -> List[Optional[TO]]:
-        if not data:
-            return []
-
-        return [cls.de_json(d, bot) for d in data]
+        return [cls.de_json(d, bot) for d in data] if data else []
 
     def to_json(self) -> str:
         """
@@ -81,7 +72,7 @@ class TelegramObject:
         return json.dumps(self.to_dict())
 
     def to_dict(self) -> JSONDict:
-        data = dict()
+        data = {}
 
         for key in iter(self.__dict__):
             if key == 'bot' or key.startswith('_'):
@@ -89,11 +80,7 @@ class TelegramObject:
 
             value = self.__dict__[key]
             if value is not None:
-                if hasattr(value, 'to_dict'):
-                    data[key] = value.to_dict()
-                else:
-                    data[key] = value
-
+                data[key] = value.to_dict() if hasattr(value, 'to_dict') else value
         if data.get('from_user'):
             data['from'] = data.pop('from_user', None)
         return data

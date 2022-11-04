@@ -52,19 +52,15 @@ class InputFile:
 
     def __init__(self, obj: Union[IO, bytes], filename: str = None, attach: bool = None):
         self.filename = None
-        if isinstance(obj, bytes):
-            self.input_file_content = obj
-        else:
-            self.input_file_content = obj.read()
-        self.attach = 'attached' + uuid4().hex if attach else None
+        self.input_file_content = obj if isinstance(obj, bytes) else obj.read()
+        self.attach = f'attached{uuid4().hex}' if attach else None
 
         if filename:
             self.filename = filename
         elif hasattr(obj, 'name') and not isinstance(obj.name, int):  # type: ignore[union-attr]
             self.filename = os.path.basename(obj.name)  # type: ignore[union-attr]
 
-        image_mime_type = self.is_image(self.input_file_content)
-        if image_mime_type:
+        if image_mime_type := self.is_image(self.input_file_content):
             self.mimetype = image_mime_type
         elif self.filename:
             self.mimetype = mimetypes.guess_type(self.filename)[0] or DEFAULT_MIME_TYPE
@@ -91,10 +87,7 @@ class InputFile:
 
         """
         try:
-            image = imghdr.what(None, stream)
-            if image:
-                return f'image/{image}'
-            return None
+            return f'image/{image}' if (image := imghdr.what(None, stream)) else None
         except Exception:
             logger.debug(
                 "Could not parse file content. Assuming that file is not an image.", exc_info=True
@@ -106,6 +99,4 @@ class InputFile:
         return hasattr(obj, 'read')
 
     def to_dict(self) -> Optional[str]:
-        if self.attach:
-            return 'attach://' + self.attach
-        return None
+        return f'attach://{self.attach}' if self.attach else None

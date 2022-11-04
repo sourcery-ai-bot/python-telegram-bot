@@ -165,7 +165,7 @@ class Chat(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.id = int(id)
+        self.id = id
         self.type = type
         # Optionals
         self.title = title
@@ -211,9 +211,7 @@ class Chat(TelegramObject):
     def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If the chat has a :attr:`username`, returns a t.me
         link of the chat."""
-        if self.username:
-            return f"https://t.me/{self.username}"
-        return None
+        return f"https://t.me/{self.username}" if self.username else None
 
     @classmethod
     def de_json(cls, data: JSONDict, bot: 'Bot') -> Optional['Chat']:

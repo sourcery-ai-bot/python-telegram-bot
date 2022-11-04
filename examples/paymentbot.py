@@ -29,8 +29,11 @@ logger = logging.getLogger(__name__)
 
 
 def start_callback(update: Update, context: CallbackContext) -> None:
-    msg = "Use /shipping to get an invoice for shipping-payment, "
-    msg += "or /noshipping for an invoice without shipping."
+    msg = (
+        "Use /shipping to get an invoice for shipping-payment, "
+        + "or /noshipping for an invoice without shipping."
+    )
+
     update.message.reply_text(msg)
 
 
@@ -99,9 +102,7 @@ def shipping_callback(update: Update, context: CallbackContext) -> None:
         query.answer(ok=False, error_message="Something went wrong...")
         return
 
-    options = list()
-    # a single LabeledPrice
-    options.append(ShippingOption('1', 'Shipping Option A', [LabeledPrice('A', 100)]))
+    options = [ShippingOption('1', 'Shipping Option A', [LabeledPrice('A', 100)])]
     # an array of LabeledPrice objects
     price_list = [LabeledPrice('B1', 150), LabeledPrice('B2', 200)]
     options.append(ShippingOption('2', 'Shipping Option B', price_list))

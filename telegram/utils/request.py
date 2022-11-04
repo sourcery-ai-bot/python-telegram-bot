@@ -119,7 +119,7 @@ class Request:
         read_timeout: float = 5.0,
     ):
         if urllib3_proxy_kwargs is None:
-            urllib3_proxy_kwargs = dict()
+            urllib3_proxy_kwargs = {}
 
         self._connect_timeout = connect_timeout
 
@@ -164,14 +164,8 @@ class Request:
             'SOCKSProxyManager',  # noqa: F821
             urllib3.ProxyManager,
         ] = None  # type: ignore
-        if not proxy_url:
-            if appengine.is_appengine_sandbox():
-                # Use URLFetch service if running in App Engine
-                self._con_pool = appengine.AppEngineManager()
-            else:
-                self._con_pool = urllib3.PoolManager(**kwargs)
-        else:
-            kwargs.update(urllib3_proxy_kwargs)
+        if proxy_url:
+            kwargs |= urllib3_proxy_kwargs
             if proxy_url.startswith('socks'):
                 try:
                     # pylint: disable=C0415
@@ -187,6 +181,12 @@ class Request:
                     mgr.proxy_headers.update(auth_hdrs)
 
                 self._con_pool = mgr
+
+        elif appengine.is_appengine_sandbox():
+            # Use URLFetch service if running in App Engine
+            self._con_pool = appengine.AppEngineManager()
+        else:
+            self._con_pool = urllib3.PoolManager(**kwargs)
 
     @property
     def con_pool_size(self) -> int:
@@ -213,13 +213,10 @@ class Request:
 
         if not data.get('ok'):  # pragma: no cover
             description = data.get('description')
-            parameters = data.get('parameters')
-            if parameters:
-                migrate_to_chat_id = parameters.get('migrate_to_chat_id')
-                if migrate_to_chat_id:
+            if parameters := data.get('parameters'):
+                if migrate_to_chat_id := parameters.get('migrate_to_chat_id'):
                     raise ChatMigrated(migrate_to_chat_id)
-                retry_after = parameters.get('retry_after')
-                if retry_after:
+                if retry_after := parameters.get('retry_after'):
                     raise RetryAfter(retry_after)
             if description:
                 return description

@@ -67,4 +67,4 @@ class TestDelayQueue:
                 passes.append(part)
             else:
                 fails.append(part)
-        assert fails == []
+        assert not fails

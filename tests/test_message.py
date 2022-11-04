@@ -600,7 +600,7 @@ class TestMessage:
         message.chat.id = id
         message.chat.type = type
         # The leading - for group ids/ -100 for supergroup ids isn't supposed to be in the link
-        assert message.link == f'https://t.me/c/{3}/{message.message_id}'
+        assert message.link == f'https://t.me/c/3/{message.message_id}'
 
     @pytest.mark.parametrize('id, username', argvalues=[(None, 'username'), (-3, None)])
     def test_link_private_chats(self, message, id, username):

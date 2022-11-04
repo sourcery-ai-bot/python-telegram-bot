@@ -45,9 +45,7 @@ previous_name = None
 
 
 def _get_name(location):
-    if location[0].startswith('tests/'):
-        return location[0][6:]
-    return location[0]
+    return location[0][6:] if location[0].startswith('tests/') else location[0]
 
 
 @pytest.mark.trylast

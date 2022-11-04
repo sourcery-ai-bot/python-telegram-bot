@@ -83,7 +83,7 @@ class Game(TelegramObject):
         self.photo = photo
         # Optionals
         self.text = text
-        self.text_entities = text_entities or list()
+        self.text_entities = text_entities or []
         self.animation = animation
 
         self._id_attrs = (self.title, self.description, self.photo)
@@ -171,4 +171,4 @@ class Game(TelegramObject):
         }
 
     def __hash__(self) -> int:
-        return hash((self.title, self.description, tuple(p for p in self.photo)))
+        return hash((self.title, self.description, tuple(self.photo)))

@@ -381,7 +381,7 @@ class Message(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.message_id = int(message_id)
+        self.message_id = message_id
         # Optionals
         self.from_user = from_user
         self.sender_chat = sender_chat
@@ -393,12 +393,12 @@ class Message(TelegramObject):
         self.reply_to_message = reply_to_message
         self.edit_date = edit_date
         self.text = text
-        self.entities = entities or list()
-        self.caption_entities = caption_entities or list()
+        self.entities = entities or []
+        self.caption_entities = caption_entities or []
         self.audio = audio
         self.game = game
         self.document = document
-        self.photo = photo or list()
+        self.photo = photo or []
         self.sticker = sticker
         self.video = video
         self.voice = voice
@@ -407,16 +407,16 @@ class Message(TelegramObject):
         self.contact = contact
         self.location = location
         self.venue = venue
-        self.new_chat_members = new_chat_members or list()
+        self.new_chat_members = new_chat_members or []
         self.left_chat_member = left_chat_member
         self.new_chat_title = new_chat_title
-        self.new_chat_photo = new_chat_photo or list()
-        self.delete_chat_photo = bool(delete_chat_photo)
-        self.group_chat_created = bool(group_chat_created)
-        self.supergroup_chat_created = bool(supergroup_chat_created)
+        self.new_chat_photo = new_chat_photo or []
+        self.delete_chat_photo = delete_chat_photo
+        self.group_chat_created = group_chat_created
+        self.supergroup_chat_created = supergroup_chat_created
         self.migrate_to_chat_id = migrate_to_chat_id
         self.migrate_from_chat_id = migrate_from_chat_id
-        self.channel_chat_created = bool(channel_chat_created)
+        self.channel_chat_created = channel_chat_created
         self.pinned_message = pinned_message
         self.forward_from_message_id = forward_from_message_id
         self.invoice = invoice
@@ -447,11 +447,7 @@ class Message(TelegramObject):
         """:obj:`str`: Convenience property. If the chat of the message is not
         a private chat or normal group, returns a t.me link of the message."""
         if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
-            if self.chat.username:
-                to_link = self.chat.username
-            else:
-                # Get rid of leading -100 for supergroups
-                to_link = f"c/{str(self.chat.id)[4:]}"
+            to_link = self.chat.username or f"c/{str(self.chat.id)[4:]}"
             return f"https://t.me/{to_link}/{self.message_id}"
         return None
 
@@ -542,12 +538,14 @@ class Message(TelegramObject):
         if self._effective_attachment is not _UNDEFINED:
             return self._effective_attachment  # type: ignore
 
-        for i in Message.ATTACHMENT_TYPES:
-            if getattr(self, i, None):
-                self._effective_attachment = getattr(self, i)
-                break
-        else:
-            self._effective_attachment = None
+        self._effective_attachment = next(
+            (
+                getattr(self, i)
+                for i in Message.ATTACHMENT_TYPES
+                if getattr(self, i, None)
+            ),
+            None,
+        )
 
         return self._effective_attachment  # type: ignore
 
@@ -587,17 +585,13 @@ class Message(TelegramObject):
         if reply_to_message_id is not None:
             return reply_to_message_id
 
-        if quote is not None:
-            if quote:
-                return self.message_id
-
-        else:
-            if self.bot.defaults:
-                default_quote = self.bot.defaults.quote
-            else:
-                default_quote = None
+        if quote is None:
+            default_quote = self.bot.defaults.quote if self.bot.defaults else None
             if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:
                 return self.message_id
+
+        elif quote:
+            return self.message_id
 
         return None
 

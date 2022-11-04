@@ -65,9 +65,7 @@ END = ConversationHandler.END
 
 # Helper
 def _name_switcher(level):
-    if level == PARENTS:
-        return 'Father', 'Mother'
-    return 'Brother', 'Sister'
+    return ('Father', 'Mother') if level == PARENTS else ('Brother', 'Sister')
 
 
 # Top level conversation callbacks
@@ -137,7 +135,7 @@ def show_data(update: Update, context: CallbackContext) -> None:
         return text
 
     user_data = context.user_data
-    text = 'Yourself:' + prettyprint(user_data, SELF)
+    text = f'Yourself:{prettyprint(user_data, SELF)}'
     text += '\n\nParents:' + prettyprint(user_data, PARENTS)
     text += '\n\nChildren:' + prettyprint(user_data, CHILDREN)
 
@@ -201,14 +199,17 @@ def select_gender(update: Update, context: CallbackContext) -> None:
 
     buttons = [
         [
-            InlineKeyboardButton(text='Add ' + male, callback_data=str(MALE)),
-            InlineKeyboardButton(text='Add ' + female, callback_data=str(FEMALE)),
+            InlineKeyboardButton(text=f'Add {male}', callback_data=str(MALE)),
+            InlineKeyboardButton(
+                text=f'Add {female}', callback_data=str(FEMALE)
+            ),
         ],
         [
             InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
             InlineKeyboardButton(text='Back', callback_data=str(END)),
         ],
     ]
+
     keyboard = InlineKeyboardMarkup(buttons)
 
     update.callback_query.answer()
@@ -312,17 +313,21 @@ def main():
     description_conv = ConversationHandler(
         entry_points=[
             CallbackQueryHandler(
-                select_feature, pattern='^' + str(MALE) + '$|^' + str(FEMALE) + '$'
+                select_feature, pattern=f'^{str(MALE)}$|^{str(FEMALE)}$'
             )
         ],
         states={
             SELECTING_FEATURE: [
-                CallbackQueryHandler(ask_for_input, pattern='^(?!' + str(END) + ').*$')
+                CallbackQueryHandler(
+                    ask_for_input, pattern=f'^(?!{str(END)}).*$'
+                )
             ],
-            TYPING: [MessageHandler(Filters.text & ~Filters.command, save_input)],
+            TYPING: [
+                MessageHandler(Filters.text & ~Filters.command, save_input)
+            ],
         },
         fallbacks=[
-            CallbackQueryHandler(end_describing, pattern='^' + str(END) + '$'),
+            CallbackQueryHandler(end_describing, pattern=f'^{str(END)}$'),
             CommandHandler('stop', stop_nested),
         ],
         map_to_parent={
@@ -333,18 +338,25 @@ def main():
         },
     )
 
+
     # Set up second level ConversationHandler (adding a person)
     add_member_conv = ConversationHandler(
-        entry_points=[CallbackQueryHandler(select_level, pattern='^' + str(ADDING_MEMBER) + '$')],
+        entry_points=[
+            CallbackQueryHandler(
+                select_level, pattern=f'^{str(ADDING_MEMBER)}$'
+            )
+        ],
         states={
             SELECTING_LEVEL: [
-                CallbackQueryHandler(select_gender, pattern=f'^{PARENTS}$|^{CHILDREN}$')
+                CallbackQueryHandler(
+                    select_gender, pattern=f'^{PARENTS}$|^{CHILDREN}$'
+                )
             ],
             SELECTING_GENDER: [description_conv],
         },
         fallbacks=[
-            CallbackQueryHandler(show_data, pattern='^' + str(SHOWING) + '$'),
-            CallbackQueryHandler(end_second_level, pattern='^' + str(END) + '$'),
+            CallbackQueryHandler(show_data, pattern=f'^{str(SHOWING)}$'),
+            CallbackQueryHandler(end_second_level, pattern=f'^{str(END)}$'),
             CommandHandler('stop', stop_nested),
         ],
         map_to_parent={
@@ -357,19 +369,21 @@ def main():
         },
     )
 
+
     # Set up top level ConversationHandler (selecting action)
     # Because the states of the third level conversation map to the ones of the econd level
     # conversation, we need to make sure the top level conversation can also handle them
     selection_handlers = [
         add_member_conv,
-        CallbackQueryHandler(show_data, pattern='^' + str(SHOWING) + '$'),
-        CallbackQueryHandler(adding_self, pattern='^' + str(ADDING_SELF) + '$'),
-        CallbackQueryHandler(end, pattern='^' + str(END) + '$'),
+        CallbackQueryHandler(show_data, pattern=f'^{str(SHOWING)}$'),
+        CallbackQueryHandler(adding_self, pattern=f'^{str(ADDING_SELF)}$'),
+        CallbackQueryHandler(end, pattern=f'^{str(END)}$'),
     ]
+
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            SHOWING: [CallbackQueryHandler(start, pattern='^' + str(END) + '$')],
+            SHOWING: [CallbackQueryHandler(start, pattern=f'^{str(END)}$')],
             SELECTING_ACTION: selection_handlers,
             SELECTING_LEVEL: selection_handlers,
             DESCRIBING_SELF: [description_conv],
@@ -377,6 +391,7 @@ def main():
         },
         fallbacks=[CommandHandler('stop', stop)],
     )
+
 
     dispatcher.add_handler(conv_handler)
 

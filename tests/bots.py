@@ -58,10 +58,7 @@ if GITHUB_ACTION is not None and BOTS is not None and JOB_INDEX is not None:
 
 
 def get(name, fallback):
-    # If we have TOKEN, PAYMENT_PROVIDER_TOKEN, CHAT_ID, SUPER_GROUP_ID,
-    # CHANNEL_ID, BOT_NAME, or BOT_USERNAME in the environment, then use that
-    val = os.getenv(name.upper())
-    if val:
+    if val := os.getenv(name.upper()):
         return val
 
     # If we're running as a github action then fetch bots from the repo secrets

@@ -30,9 +30,8 @@ from tests.conftest import expect_bad_request, check_shortcut_call, check_shortc
 
 @pytest.fixture(scope='function')
 def photo_file():
-    f = open('tests/data/telegram.jpg', 'rb')
-    yield f
-    f.close()
+    with open('tests/data/telegram.jpg', 'rb') as f:
+        yield f
 
 
 @pytest.fixture(scope='class')

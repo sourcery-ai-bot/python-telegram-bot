@@ -44,8 +44,8 @@ class InlineQueryResult(TelegramObject):
 
     def __init__(self, type: str, id: str, **_kwargs: Any):
         # Required
-        self.type = str(type)
-        self.id = str(id)  # pylint: disable=C0103
+        self.type = type
+        self.id = id
 
         self._id_attrs = (self.id,)
 

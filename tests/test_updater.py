@@ -404,7 +404,7 @@ class TestUpdater:
             # 2nd call from bootstrap____clean
             # we should be called with offset = 4
             # save value passed in self.offset for assert down below
-            if len(args) > 0:
+            if args:
                 self.offset = int(args[0])
                 return []
 
@@ -418,7 +418,7 @@ class TestUpdater:
             # build list of fake updates
             # returns list of 4 objects with
             # update_id's 0, 1, 2 and 3
-            return [FakeUpdate(i) for i in range(0, expected_id)]
+            return [FakeUpdate(i) for i in range(expected_id)]
 
         monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
 

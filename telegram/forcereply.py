@@ -52,8 +52,8 @@ class ForceReply(ReplyMarkup):
 
     def __init__(self, force_reply: bool = True, selective: bool = False, **_kwargs: Any):
         # Required
-        self.force_reply = bool(force_reply)
+        self.force_reply = force_reply
         # Optionals
-        self.selective = bool(selective)
+        self.selective = selective
 
         self._id_attrs = (self.selective,)

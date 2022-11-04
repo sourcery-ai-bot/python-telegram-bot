@@ -160,13 +160,11 @@ class InlineQueryHandler(Handler[Update]):
         """
 
         if isinstance(update, Update) and update.inline_query:
-            if self.pattern:
-                if update.inline_query.query:
-                    match = re.match(self.pattern, update.inline_query.query)
-                    if match:
-                        return match
-            else:
+            if not self.pattern:
                 return True
+            if update.inline_query.query:
+                if match := re.match(self.pattern, update.inline_query.query):
+                    return match
         return None
 
     def collect_optional_args(

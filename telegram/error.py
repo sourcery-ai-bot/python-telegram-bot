@@ -31,11 +31,7 @@ def _lstrip_str(in_s: str, lstr: str) -> str:
         :obj:`str`: The stripped string.
 
     """
-    if in_s.startswith(lstr):
-        res = in_s[len(lstr) :]
-    else:
-        res = in_s
-    return res
+    return in_s[len(lstr) :] if in_s.startswith(lstr) else in_s
 
 
 class TelegramError(Exception):
@@ -51,7 +47,7 @@ class TelegramError(Exception):
         self.message = msg
 
     def __str__(self) -> str:
-        return '%s' % self.message
+        return f'{self.message}'
 
     def __reduce__(self) -> Tuple[type, Tuple[str]]:
         return self.__class__, (self.message,)

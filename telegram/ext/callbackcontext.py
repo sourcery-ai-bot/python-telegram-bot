@@ -162,12 +162,9 @@ class CallbackContext:
         self = cls(dispatcher)
 
         if update is not None and isinstance(update, Update):
-            chat = update.effective_chat
-            user = update.effective_user
-
-            if chat:
+            if chat := update.effective_chat:
                 self._chat_data = dispatcher.chat_data[chat.id]  # pylint: disable=W0212
-            if user:
+            if user := update.effective_user:
                 self._user_data = dispatcher.user_data[user.id]  # pylint: disable=W0212
         return self
 

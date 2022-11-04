@@ -135,8 +135,7 @@ class JobQueue:
         """
         self._dispatcher = dispatcher
         if dispatcher.bot.defaults:
-            if dispatcher.bot.defaults:
-                self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
+            self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
 
     def run_once(
         self,
@@ -633,6 +632,4 @@ class Job:
         return False
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, self.__class__):
-            return self.id == other.id
-        return False
+        return self.id == other.id if isinstance(other, self.__class__) else False

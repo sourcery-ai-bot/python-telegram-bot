@@ -13,9 +13,7 @@ def requirements():
     requirements_list = []
 
     with open('requirements.txt') as requirements:
-        for install in requirements:
-            requirements_list.append(install.strip())
-
+        requirements_list.extend(install.strip() for install in requirements)
     return requirements_list
 
 

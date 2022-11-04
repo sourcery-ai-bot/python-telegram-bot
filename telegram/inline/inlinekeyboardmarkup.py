@@ -52,9 +52,10 @@ class InlineKeyboardMarkup(ReplyMarkup):
     def to_dict(self) -> JSONDict:
         data = super().to_dict()
 
-        data['inline_keyboard'] = []
-        for inline_keyboard in self.inline_keyboard:
-            data['inline_keyboard'].append([x.to_dict() for x in inline_keyboard])
+        data['inline_keyboard'] = [
+            [x.to_dict() for x in inline_keyboard]
+            for inline_keyboard in self.inline_keyboard
+        ]
 
         return data
 
@@ -69,8 +70,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
         for row in data['inline_keyboard']:
             tmp = []
             for col in row:
-                btn = InlineKeyboardButton.de_json(col, bot)
-                if btn:
+                if btn := InlineKeyboardButton.de_json(col, bot):
                     tmp.append(btn)
             keyboard.append(tmp)
 
@@ -129,17 +129,17 @@ class InlineKeyboardMarkup(ReplyMarkup):
         return cls(button_grid, **kwargs)
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, self.__class__):
-            if len(self.inline_keyboard) != len(other.inline_keyboard):
+        if not isinstance(other, self.__class__):
+            return super().__eq__(other)
+        if len(self.inline_keyboard) != len(other.inline_keyboard):
+            return False
+        for idx, row in enumerate(self.inline_keyboard):
+            if len(row) != len(other.inline_keyboard[idx]):
                 return False
-            for idx, row in enumerate(self.inline_keyboard):
-                if len(row) != len(other.inline_keyboard[idx]):
+            for jdx, button in enumerate(row):
+                if button != other.inline_keyboard[idx][jdx]:
                     return False
-                for jdx, button in enumerate(row):
-                    if button != other.inline_keyboard[idx][jdx]:
-                        return False
-            return True
-        return super().__eq__(other)
+        return True
 
     def __hash__(self) -> int:
-        return hash(tuple(tuple(button for button in row) for row in self.inline_keyboard))
+        return hash(tuple(tuple(row) for row in self.inline_keyboard))

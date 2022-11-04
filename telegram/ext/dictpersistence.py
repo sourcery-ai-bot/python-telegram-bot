@@ -140,9 +140,7 @@ class DictPersistence(BasePersistence):
     @property
     def user_data_json(self) -> str:
         """:obj:`str`: The user_data serialized as a JSON-string."""
-        if self._user_data_json:
-            return self._user_data_json
-        return json.dumps(self.user_data)
+        return self._user_data_json or json.dumps(self.user_data)
 
     @property
     def chat_data(self) -> Optional[DefaultDict[int, Dict]]:
@@ -152,9 +150,7 @@ class DictPersistence(BasePersistence):
     @property
     def chat_data_json(self) -> str:
         """:obj:`str`: The chat_data serialized as a JSON-string."""
-        if self._chat_data_json:
-            return self._chat_data_json
-        return json.dumps(self.chat_data)
+        return self._chat_data_json or json.dumps(self.chat_data)
 
     @property
     def bot_data(self) -> Optional[Dict]:
@@ -164,9 +160,7 @@ class DictPersistence(BasePersistence):
     @property
     def bot_data_json(self) -> str:
         """:obj:`str`: The bot_data serialized as a JSON-string."""
-        if self._bot_data_json:
-            return self._bot_data_json
-        return json.dumps(self.bot_data)
+        return self._bot_data_json or json.dumps(self.bot_data)
 
     @property
     def conversations(self) -> Optional[Dict[str, Dict[Tuple, Any]]]:
@@ -176,9 +170,9 @@ class DictPersistence(BasePersistence):
     @property
     def conversations_json(self) -> str:
         """:obj:`str`: The conversations serialized as a JSON-string."""
-        if self._conversations_json:
-            return self._conversations_json
-        return encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
+        return self._conversations_json or encode_conversations_to_json(
+            self.conversations
+        )
 
     def get_user_data(self) -> DefaultDict[int, Dict[Any, Any]]:
         """Returns the user_data created from the ``user_data_json`` or an empty
@@ -187,9 +181,7 @@ class DictPersistence(BasePersistence):
         Returns:
             :obj:`defaultdict`: The restored user data.
         """
-        if self.user_data:
-            pass
-        else:
+        if not self.user_data:
             self._user_data = defaultdict(dict)
         return deepcopy(self.user_data)  # type: ignore[arg-type]
 
@@ -200,9 +192,7 @@ class DictPersistence(BasePersistence):
         Returns:
             :obj:`defaultdict`: The restored chat data.
         """
-        if self.chat_data:
-            pass
-        else:
+        if not self.chat_data:
             self._chat_data = defaultdict(dict)
         return deepcopy(self.chat_data)  # type: ignore[arg-type]
 
@@ -212,9 +202,7 @@ class DictPersistence(BasePersistence):
         Returns:
             :obj:`dict`: The restored bot data.
         """
-        if self.bot_data:
-            pass
-        else:
+        if not self.bot_data:
             self._bot_data = {}
         return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
@@ -225,9 +213,7 @@ class DictPersistence(BasePersistence):
         Returns:
             :obj:`dict`: The restored conversations data.
         """
-        if self.conversations:
-            pass
-        else:
+        if not self.conversations:
             self._conversations = {}
         return self.conversations.get(name, {}).copy()  # type: ignore[union-attr]
 

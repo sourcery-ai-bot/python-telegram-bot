@@ -85,9 +85,9 @@ class ReplyKeyboardMarkup(ReplyMarkup):
             self.keyboard.append(button_row)
 
         # Optionals
-        self.resize_keyboard = bool(resize_keyboard)
-        self.one_time_keyboard = bool(one_time_keyboard)
-        self.selective = bool(selective)
+        self.resize_keyboard = resize_keyboard
+        self.one_time_keyboard = one_time_keyboard
+        self.selective = selective
 
     def to_dict(self) -> JSONDict:
         data = super().to_dict()
@@ -242,22 +242,22 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         )
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, self.__class__):
-            if len(self.keyboard) != len(other.keyboard):
+        if not isinstance(other, self.__class__):
+            return super().__eq__(other)
+        if len(self.keyboard) != len(other.keyboard):
+            return False
+        for idx, row in enumerate(self.keyboard):
+            if len(row) != len(other.keyboard[idx]):
                 return False
-            for idx, row in enumerate(self.keyboard):
-                if len(row) != len(other.keyboard[idx]):
+            for jdx, button in enumerate(row):
+                if button != other.keyboard[idx][jdx]:
                     return False
-                for jdx, button in enumerate(row):
-                    if button != other.keyboard[idx][jdx]:
-                        return False
-            return True
-        return super().__eq__(other)
+        return True
 
     def __hash__(self) -> int:
         return hash(
             (
-                tuple(tuple(button for button in row) for row in self.keyboard),
+                tuple(tuple(row) for row in self.keyboard),
                 self.resize_keyboard,
                 self.one_time_keyboard,
                 self.selective,

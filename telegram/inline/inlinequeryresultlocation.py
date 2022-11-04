@@ -98,8 +98,8 @@ class InlineQueryResultLocation(InlineQueryResult):
     ):
         # Required
         super().__init__('location', id)
-        self.latitude = float(latitude)
-        self.longitude = float(longitude)
+        self.latitude = latitude
+        self.longitude = longitude
         self.title = title
 
         # Optionals
@@ -109,8 +109,6 @@ class InlineQueryResultLocation(InlineQueryResult):
         self.thumb_url = thumb_url
         self.thumb_width = thumb_width
         self.thumb_height = thumb_height
-        self.horizontal_accuracy = float(horizontal_accuracy) if horizontal_accuracy else None
-        self.heading = int(heading) if heading else None
-        self.proximity_alert_radius = (
-            int(proximity_alert_radius) if proximity_alert_radius else None
-        )
+        self.horizontal_accuracy = horizontal_accuracy or None
+        self.heading = heading or None
+        self.proximity_alert_radius = proximity_alert_radius or None

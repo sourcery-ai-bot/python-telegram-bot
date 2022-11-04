@@ -31,9 +31,8 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature
 
 @pytest.fixture(scope='function')
 def animation_file():
-    f = open('tests/data/game.gif', 'rb')
-    yield f
-    f.close()
+    with open('tests/data/game.gif', 'rb') as f:
+        yield f
 
 
 @pytest.fixture(scope='class')

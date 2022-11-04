@@ -176,18 +176,19 @@ def main():
         entry_points=[CommandHandler('start', start)],
         states={
             FIRST: [
-                CallbackQueryHandler(one, pattern='^' + str(ONE) + '$'),
-                CallbackQueryHandler(two, pattern='^' + str(TWO) + '$'),
-                CallbackQueryHandler(three, pattern='^' + str(THREE) + '$'),
-                CallbackQueryHandler(four, pattern='^' + str(FOUR) + '$'),
+                CallbackQueryHandler(one, pattern=f'^{str(ONE)}$'),
+                CallbackQueryHandler(two, pattern=f'^{str(TWO)}$'),
+                CallbackQueryHandler(three, pattern=f'^{str(THREE)}$'),
+                CallbackQueryHandler(four, pattern=f'^{str(FOUR)}$'),
             ],
             SECOND: [
-                CallbackQueryHandler(start_over, pattern='^' + str(ONE) + '$'),
-                CallbackQueryHandler(end, pattern='^' + str(TWO) + '$'),
+                CallbackQueryHandler(start_over, pattern=f'^{str(ONE)}$'),
+                CallbackQueryHandler(end, pattern=f'^{str(TWO)}$'),
             ],
         },
         fallbacks=[CommandHandler('start', start)],
     )
+
 
     # Add ConversationHandler to dispatcher that will be used for handling
     # updates

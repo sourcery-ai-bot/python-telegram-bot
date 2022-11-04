@@ -49,12 +49,14 @@ def find_next_sibling_until(tag, name, until):
 
 def parse_table(h4):
     table = find_next_sibling_until(h4, 'table', h4.find_next_sibling('h4'))
-    if not table:
-        return []
-    t = []
-    for tr in table.find_all('tr')[1:]:
-        t.append([td.text for td in tr.find_all('td')])
-    return t
+    return (
+        [
+            [td.text for td in tr.find_all('td')]
+            for tr in table.find_all('tr')[1:]
+        ]
+        if table
+        else []
+    )
 
 
 def check_method(h4):

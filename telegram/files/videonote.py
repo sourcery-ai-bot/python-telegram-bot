@@ -72,10 +72,10 @@ class VideoNote(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
-        self.length = int(length)
-        self.duration = int(duration)
+        self.file_id = file_id
+        self.file_unique_id = file_unique_id
+        self.length = length
+        self.duration = duration
         # Optionals
         self.thumb = thumb
         self.file_size = file_size

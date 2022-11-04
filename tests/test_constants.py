@@ -44,7 +44,7 @@ class TestConstants:
             good_msg = bot.send_photo(photo=f, caption=good_caption, chat_id=chat_id)
         assert good_msg.caption == good_caption
 
-        bad_caption = good_caption + 'Z'
+        bad_caption = f'{good_caption}Z'
         with pytest.raises(
             BadRequest,
             match="Media_caption_too_long",

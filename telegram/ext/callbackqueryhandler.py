@@ -159,13 +159,11 @@ class CallbackQueryHandler(Handler[Update]):
 
         """
         if isinstance(update, Update) and update.callback_query:
-            if self.pattern:
-                if update.callback_query.data:
-                    match = re.match(self.pattern, update.callback_query.data)
-                    if match:
-                        return match
-            else:
+            if not self.pattern:
                 return True
+            if update.callback_query.data:
+                if match := re.match(self.pattern, update.callback_query.data):
+                    return match
         return None
 
     def collect_optional_args(

@@ -75,24 +75,20 @@ def default_bot(request, bot_info):
 
     defaults = Defaults(**param)
     default_bot = DEFAULT_BOTS.get(defaults)
-    if default_bot:
-        return default_bot
-    else:
+    if not default_bot:
         default_bot = make_bot(bot_info, **{'defaults': defaults})
         DEFAULT_BOTS[defaults] = default_bot
-        return default_bot
+    return default_bot
 
 
 @pytest.fixture(scope='function')
 def tz_bot(timezone, bot_info):
     defaults = Defaults(tzinfo=timezone)
     default_bot = DEFAULT_BOTS.get(defaults)
-    if default_bot:
-        return default_bot
-    else:
+    if not default_bot:
         default_bot = make_bot(bot_info, **{'defaults': defaults})
         DEFAULT_BOTS[defaults] = default_bot
-        return default_bot
+    return default_bot
 
 
 @pytest.fixture(scope='session')
@@ -176,16 +172,14 @@ def updater(bot):
 
 @pytest.fixture(scope='function')
 def thumb_file():
-    f = open('tests/data/thumb.jpg', 'rb')
-    yield f
-    f.close()
+    with open('tests/data/thumb.jpg', 'rb') as f:
+        yield f
 
 
 @pytest.fixture(scope='class')
 def class_thumb_file():
-    f = open('tests/data/thumb.jpg', 'rb')
-    yield f
-    f.close()
+    with open('tests/data/thumb.jpg', 'rb') as f:
+        yield f
 
 
 def pytest_configure(config):
@@ -235,12 +229,15 @@ def make_command_message(text, **kwargs):
     entities = (
         [
             MessageEntity(
-                type=MessageEntity.BOT_COMMAND, offset=match.start(0), length=len(match.group(0))
+                type=MessageEntity.BOT_COMMAND,
+                offset=match.start(0),
+                length=len(match[0]),
             )
         ]
         if match
         else []
     )
+
 
     return make_message(text, entities=entities, **kwargs)
 
@@ -257,7 +254,7 @@ def make_message_update(message, message_factory=make_message, edited=False, **k
     """
     if not isinstance(message, Message):
         message = message_factory(message, **kwargs)
-    update_kwargs = {'message' if not edited else 'edited_message': message}
+    update_kwargs = {'edited_message' if edited else 'message': message}
     return Update(0, **update_kwargs)
 
 

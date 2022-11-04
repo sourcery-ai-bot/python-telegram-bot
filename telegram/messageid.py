@@ -33,6 +33,6 @@ class MessageId(TelegramObject):
     """
 
     def __init__(self, message_id: int, **_kwargs: Any):
-        self.message_id = int(message_id)
+        self.message_id = message_id
 
         self._id_attrs = (self.message_id,)

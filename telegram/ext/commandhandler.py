@@ -203,14 +203,13 @@ class CommandHandler(Handler[Update]):
                 command_parts = command.split('@')
                 command_parts.append(message.bot.username)
 
-                if not (
-                    command_parts[0].lower() in self.command
-                    and command_parts[1].lower() == message.bot.username.lower()
+                if (
+                    command_parts[0].lower() not in self.command
+                    or command_parts[1].lower() != message.bot.username.lower()
                 ):
                     return None
 
-                filter_result = self.filters(update)
-                if filter_result:
+                if filter_result := self.filters(update):
                     return args, filter_result
                 return False
         return None
@@ -354,9 +353,9 @@ class PrefixHandler(CommandHandler):
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
 
-        self._prefix: List[str] = list()
-        self._command: List[str] = list()
-        self._commands: List[str] = list()
+        self._prefix: List[str] = []
+        self._command: List[str] = []
+        self._commands: List[str] = []
 
         super().__init__(
             'nocommand',
@@ -387,10 +386,7 @@ class PrefixHandler(CommandHandler):
 
     @prefix.setter
     def prefix(self, prefix: Union[str, List[str]]) -> None:
-        if isinstance(prefix, str):
-            self._prefix = [prefix.lower()]
-        else:
-            self._prefix = prefix
+        self._prefix = [prefix.lower()] if isinstance(prefix, str) else prefix
         self._build_commands()
 
     @property  # type: ignore[override]
@@ -405,10 +401,7 @@ class PrefixHandler(CommandHandler):
 
     @command.setter
     def command(self, command: Union[str, List[str]]) -> None:
-        if isinstance(command, str):
-            self._command = [command.lower()]
-        else:
-            self._command = command
+        self._command = [command.lower()] if isinstance(command, str) else command
         self._build_commands()
 
     def _build_commands(self) -> None:
@@ -433,8 +426,7 @@ class PrefixHandler(CommandHandler):
                 text_list = message.text.split()
                 if text_list[0].lower() not in self._commands:
                     return None
-                filter_result = self.filters(update)
-                if filter_result:
+                if filter_result := self.filters(update):
                     return text_list[1:], filter_result
                 return False
         return None

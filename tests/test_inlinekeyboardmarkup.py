@@ -78,22 +78,22 @@ class TestInlineKeyboardMarkup:
 
     def test_expected_values_empty_switch(self, inline_keyboard_markup, bot, monkeypatch):
         def test(
-            url,
-            data,
-            reply_to_message_id=None,
-            disable_notification=None,
-            reply_markup=None,
-            timeout=None,
-            **kwargs,
-        ):
+                url,
+                data,
+                reply_to_message_id=None,
+                disable_notification=None,
+                reply_markup=None,
+                timeout=None,
+                **kwargs,
+            ):
             if reply_markup is not None:
                 if isinstance(reply_markup, ReplyMarkup):
                     data['reply_markup'] = reply_markup.to_json()
                 else:
                     data['reply_markup'] = reply_markup
 
-            assert bool('"switch_inline_query": ""' in data['reply_markup'])
-            assert bool('"switch_inline_query_current_chat": ""' in data['reply_markup'])
+            assert '"switch_inline_query": ""' in data['reply_markup']
+            assert '"switch_inline_query_current_chat": ""' in data['reply_markup']
 
         inline_keyboard_markup.inline_keyboard[0][0].callback_data = None
         inline_keyboard_markup.inline_keyboard[0][0].switch_inline_query = ''
